@@ -1,12 +1,10 @@
 package com.example.demo.Repositories;
 
-import java.util.List;
-
 import org.springframework.data.jpa.repository.JpaRepository;
 
-import com.Entities.Edicion;
+import com.example.demo.Entities.Edicion;
+
 
 public interface EdicionRepository extends JpaRepository<Edicion, Long> {
 
-	List<Edicion> findAbandonmentRate();
 }

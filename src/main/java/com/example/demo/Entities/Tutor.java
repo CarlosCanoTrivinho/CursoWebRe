@@ -2,7 +2,7 @@ package com.example.demo.Entities;
 
 import java.util.List;
 
-import com.POJO.Categoria;
+import com.example.demo.POJO.Categoria;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
@@ -28,5 +28,7 @@ public class Tutor {
 	
 	@OneToMany(mappedBy = "tutor", cascade = CascadeType.ALL)
     private List<Edicion> ediciones;
+	
+	
 	
 }
