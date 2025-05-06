@@ -14,7 +14,7 @@ class PaginaCursosReApplicationTests {
 	@Test
 	void contextLoads() {
 		Curso curso=new Curso();
-		cursoRepository.save(curso);
+		cursoRepository.saveAndFlush(curso);
 	}
 
 }
