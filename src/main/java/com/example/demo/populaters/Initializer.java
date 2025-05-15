@@ -7,9 +7,6 @@ import java.util.List;
 import java.util.Random;
 import java.util.Set;
 
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
-import org.springframework.stereotype.Component;
-
 import com.example.demo.Entities.Alumno;
 import com.example.demo.Entities.AlumnoEdicion;
 import com.example.demo.Entities.Curso;
@@ -21,32 +18,8 @@ import com.example.demo.Entities.Tarea;
 import com.example.demo.Entities.Tutor;
 import com.example.demo.POJO.Categoria;
 import com.example.demo.POJO.Situacion;
-import com.example.demo.Repositories.AlumnoEdicionRepository;
-import com.example.demo.Repositories.AlumnoRepository;
-import com.example.demo.Repositories.CursoRepository;
-import com.example.demo.Repositories.EdicionRepository;
-import com.example.demo.Repositories.ElementoEvaluadoRepository;
-import com.example.demo.Repositories.EnunciadoRepository;
-import com.example.demo.Repositories.RespuestaRepository;
-import com.example.demo.Repositories.TareaRepository;
-import com.example.demo.Repositories.TutorRepository;
 
-import jakarta.annotation.PostConstruct;
-import jakarta.transaction.Transactional;
-
-@Component
-@ConditionalOnProperty(name = "spring.jpa.hibernate.ddl-auto", havingValue = "create", matchIfMissing = false)
-public class Populaters {
-
-	private final AlumnoRepository alumnoRepository;
-	private final TutorRepository tutorRepository;
-	private final CursoRepository cursoRepository;
-	private final EdicionRepository edicionRepository;
-	private final AlumnoEdicionRepository alumnoEdicionRepository;
-	private final TareaRepository tareaRepository;
-	private final ElementoEvaluadoRepository elementoEvaluadoRepository;
-	private final RespuestaRepository respuestaRepository;
-	private final EnunciadoRepository enunciadoRepository;
+public class Initializer {
 	private List<Alumno> alumnos;
 	private List<Curso> cursos;
 	private List<Tutor> tutores;
@@ -56,38 +29,7 @@ public class Populaters {
 	private List<ElementoEvaluado> elementos;
 	private List<Enunciado> enunciados;
 	private List<Respuesta> respuestas;
-	// private Initializer initializer;
-
-	public Populaters(AlumnoRepository alumnoRepository, TutorRepository tutorRepository,
-			CursoRepository cursoRepository, EdicionRepository edicionRepository,
-			AlumnoEdicionRepository alumnoEdicionRepository, TareaRepository tareaRepository,
-			ElementoEvaluadoRepository elementoEvaluadoRepository, RespuestaRepository respuestaRepository,
-			EnunciadoRepository enunciadoRepository) {
-		this.alumnoRepository = alumnoRepository;
-		this.tutorRepository = tutorRepository;
-		this.cursoRepository = cursoRepository;
-		this.edicionRepository = edicionRepository;
-		this.alumnoEdicionRepository = alumnoEdicionRepository;
-		this.tareaRepository = tareaRepository;
-		this.elementoEvaluadoRepository = elementoEvaluadoRepository;
-		this.respuestaRepository = respuestaRepository;
-		this.enunciadoRepository = enunciadoRepository;
-	}
-
-	@Transactional
-	@PostConstruct
-	public void populate() {
-		// initializer.initialize();
-		alumnos = alumnoRepository.saveAll(alumnos);
-		tutores = tutorRepository.saveAll(tutores);
-		cursos = cursoRepository.saveAll(cursos);
-		ediciones = edicionRepository.saveAll(ediciones);
-		tareas = tareaRepository.saveAll(tareas);
-		matriculas = alumnoEdicionRepository.saveAll(matriculas);
-		enunciados = enunciadoRepository.saveAll(enunciados);
-		elementos = elementoEvaluadoRepository.saveAll(elementos);
-		respuestas = respuestaRepository.saveAll(respuestas);
-	}
+	
 
 	public void initialize() {
 		cursos = crearCursos();
@@ -251,7 +193,7 @@ public class Populaters {
 
 	private Curso buscarCursoPorId(long id, List<Curso> cursos) {
 
-		return cursos.stream().filter(curso -> curso.getId() == id).findFirst().get();
+		return cursos.stream().filter(curso -> curso.getId()==id).findFirst().get();
 	}
 
 	private List<Tarea> crearTareas(List<Curso> cursos) {
@@ -306,7 +248,7 @@ public class Populaters {
 		}
 		return respuestas;
 	}
-
+	
 	public List<Alumno> getAlumnos() {
 		return alumnos;
 	}
@@ -378,41 +320,4 @@ public class Populaters {
 	public void setRespuestas(List<Respuesta> respuestas) {
 		this.respuestas = respuestas;
 	}
-
-	public AlumnoRepository getAlumnoRepository() {
-		return alumnoRepository;
-	}
-
-	public TutorRepository getTutorRepository() {
-		return tutorRepository;
-	}
-
-	public CursoRepository getCursoRepository() {
-		return cursoRepository;
-	}
-
-	public EdicionRepository getEdicionRepository() {
-		return edicionRepository;
-	}
-
-	public AlumnoEdicionRepository getAlumnoEdicionRepository() {
-		return alumnoEdicionRepository;
-	}
-
-	public TareaRepository getTareaRepository() {
-		return tareaRepository;
-	}
-
-	public ElementoEvaluadoRepository getElementoEvaluadoRepository() {
-		return elementoEvaluadoRepository;
-	}
-
-	public RespuestaRepository getRespuestaRepository() {
-		return respuestaRepository;
-	}
-
-	public EnunciadoRepository getEnunciadoRepository() {
-		return enunciadoRepository;
-	}
-
 }

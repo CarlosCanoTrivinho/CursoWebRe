@@ -1,5 +1,6 @@
 package com.example.demo;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -15,9 +16,9 @@ import com.example.demo.Entities.Edicion;
 import com.example.demo.Repositories.EdicionRepository;
 
 @SpringBootTest(classes = PaginaCursosReApplication.class)
-class PaginaCursosReApplicationTests {
+class PaginaCursosReApplicationTests2 {
 //	@Autowired
-//	CursoRepository cursoRepository;s
+//	CursoRepository cursoRepository;
 	@Autowired
 	EdicionRepository edicionRepository;
 //	@Test
@@ -31,14 +32,12 @@ class PaginaCursosReApplicationTests {
 		List<Edicion> all = edicionRepository.findAll();
 		Optional<LocalDate> min = all.stream().map(edicion -> edicion.getFechaInicio()).min(LocalDate::compareTo);
 		LocalDate inicio = min.get();
-		List<Edicion> ediciones = edicionRepository.findByFechaInicioBeforeAndFechaFinalizacionAfter(inicio.plusDays(1), inicio.plusDays(1));
+		List<Edicion> ediciones = edicionRepository.findByFechaInicioLessThanEqualAndFechaFinalizacionGreaterThanEqual(inicio, inicio);
 		assertTrue(ediciones.size() > 0);
 		assertTrue(all.size() > 0);
 
-//
-//		List<Edicion> inactivos = edicionRepository.findByFechaInicioAfterOrFechaFinalizacionBefore(of, of);
-//		List<Edicion> activos = edicionRepository.findByFechaInicioBeforeAndFechaFinalizacionAfter(of, of);
-//		assertEquals(inactivos.size() + activos.size(), all.size());
+		List<Edicion> inactivos = edicionRepository.findByFechaInicioAfterOrFechaFinalizacionBefore(inicio, inicio);
+		assertEquals(inactivos.size() + ediciones.size(), all.size());
 
 //		LocalDate inicio = LocalDate.of(2025, 6, 7);
 //		long countIinico = all.stream().filter(edicion -> edicion.getFechaInicio().equals(inicio)).count();
