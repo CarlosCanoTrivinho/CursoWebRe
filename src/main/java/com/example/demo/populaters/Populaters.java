@@ -47,16 +47,6 @@ public class Populaters {
 	private final ElementoEvaluadoRepository elementoEvaluadoRepository;
 	private final RespuestaRepository respuestaRepository;
 	private final EnunciadoRepository enunciadoRepository;
-	private List<Alumno> alumnos;
-	private List<Curso> cursos;
-	private List<Tutor> tutores;
-	private List<Edicion> ediciones;
-	private List<AlumnoEdicion> matriculas;
-	private List<Tarea> tareas;
-	private List<ElementoEvaluado> elementos;
-	private List<Enunciado> enunciados;
-	private List<Respuesta> respuestas;
-	// private Initializer initializer;
 
 	public Populaters(AlumnoRepository alumnoRepository, TutorRepository tutorRepository,
 			CursoRepository cursoRepository, EdicionRepository edicionRepository,
@@ -77,33 +67,48 @@ public class Populaters {
 	@Transactional
 	@PostConstruct
 	public void populate() {
-		// initializer.initialize();
+		// 1. Crear 10 Alumnos
+		List<Alumno> alumnos = crearAlumnos();
 		alumnos = alumnoRepository.saveAll(alumnos);
-		tutores = tutorRepository.saveAll(tutores);
-		cursos = cursoRepository.saveAll(cursos);
-		ediciones = edicionRepository.saveAll(ediciones);
-		tareas = tareaRepository.saveAll(tareas);
-		matriculas = alumnoEdicionRepository.saveAll(matriculas);
-		enunciados = enunciadoRepository.saveAll(enunciados);
-		elementos = elementoEvaluadoRepository.saveAll(elementos);
-		respuestas = respuestaRepository.saveAll(respuestas);
-	}
 
-	public void initialize() {
-		cursos = crearCursos();
-		alumnos = crearAlumnos();
-		tutores = crearTutores();
-		ediciones = crearEdiciones(cursos, tutores);
-		matriculas = crearMatriculas(alumnos, ediciones);
-		tareas = crearTareas(cursos);
-		elementos = crearElementosEvaluados(matriculas, tareas);
-		enunciados = crearEnunciados(tareas);
-		respuestas = crearRespuestas(elementos, enunciados);
+		// 2. Crear 10 Tutores
+		List<Tutor> tutores = crearTutores();
+		tutorRepository.saveAll(tutores);
+
+		// 3. Crear 10 Cursos
+		List<Curso> cursos = crearCursos();
+		cursos = cursoRepository.saveAll(cursos);
+
+		// 4. Crear 20 Ediciones (2 por curso)
+		List<Edicion> ediciones = crearEdiciones(cursos, tutores);
+		ediciones = edicionRepository.saveAll(ediciones);
+
+		// 5. Matricular alumnos en ediciones
+		List<AlumnoEdicion> matriculas = crearMatriculas(alumnos, ediciones);
+		alumnoEdicionRepository.saveAll(matriculas);
+		desmatricular();
+		// 6. Crear 10 Tareas (1 por curso)
+		List<Tarea> tareas = crearTareas(cursos);
+		tareaRepository.saveAll(tareas);
+
+		// 7. Crear Elementos Evaluados
+		List<ElementoEvaluado> elementos = crearElementosEvaluados(matriculas, tareas);
+		elementoEvaluadoRepository.saveAll(elementos);
+
+		// 8. Crear Enunciados
+		List<Enunciado> enunciados = crearEnunciados(tareas);
+		enunciadoRepository.saveAll(enunciados);
+
+		// 9. Crear Respuestas
+		List<Respuesta> respuestas = crearRespuestas(elementos, enunciados);
+		respuestaRepository.saveAll(respuestas);
+
+		
 	}
 
 	private List<Alumno> crearAlumnos() {
 		List<Alumno> alumnos = new ArrayList<>();
-		for (int i = 1; i <= 10; i++) {
+		for (int i = 0; i < 10; i++) {
 			Alumno alumno = new Alumno();
 			alumno.setNombre("Alumno " + i);
 			alumno.setApellidos("Apellido " + i);
@@ -140,7 +145,7 @@ public class Populaters {
 		return cursos;
 	}
 
-	public List<Edicion> crearEdiciones(List<Curso> cursos, List<Tutor> tutores) {
+	private List<Edicion> crearEdiciones(List<Curso> cursos, List<Tutor> tutores) {
 		List<Edicion> ediciones = new ArrayList<>();
 		Random random = new Random();
 		for (Curso curso : cursos) {
@@ -195,7 +200,6 @@ public class Populaters {
 		edicionAbandonoCubriendoPlazas.setCurso(buscarCursoPorId(1, cursos));
 		edicionAbandonoCubriendoPlazas.setTutor(tutores.get(random.nextInt(tutores.size())));
 		ediciones.add(edicionAbandonoCubriendoPlazas);
-
 		return ediciones;
 	}
 
@@ -208,7 +212,7 @@ public class Populaters {
 			Set<Edicion> edicionesAsignadas = new HashSet<>();
 
 			while (edicionesAsignadas.size() < 5) {
-				Edicion edicion = ediciones.get(random.nextInt(ediciones.size()));
+				Edicion edicion = ediciones.get(random.nextInt(20));
 
 				// Evitar matricular al mismo alumno varias veces en la misma edición
 				if (!edicionesAsignadas.contains(edicion)) {
@@ -226,17 +230,18 @@ public class Populaters {
 				}
 			}
 		}
-		for (int k = 3; k < 6; k++) {
-			for (int i = 1; i <= 10; i++) {
+		for (int k = 3; k <= 6; k++) {
+			for (int i = 0; i < 10; i++) {
+				if (k == 3 && i == 4 || k == 5 && i == 4) {
+					break;
+				}
 				AlumnoEdicion alumnoEdicion = new AlumnoEdicion();
 				alumnoEdicion.setAlumno(alumnos.get(i));
 				alumnoEdicion.setEdicion(buscarPorNumEdicion(1, (short) k, ediciones));
 				Situacion situacion = Situacion.Matriculado;
 				alumnoEdicion.setSituacion(situacion);
 				matriculas.add(alumnoEdicion);
-				if (k == 3 && i == 4 || k == 5 && i == 4) {
-					i = 10;
-				}
+				
 			}
 		}
 
@@ -252,6 +257,22 @@ public class Populaters {
 	private Curso buscarCursoPorId(long id, List<Curso> cursos) {
 
 		return cursos.stream().filter(curso -> curso.getId() == id).findFirst().get();
+	}
+
+	private void desmatricular() {
+		List<AlumnoEdicion> byEdicion = alumnoEdicionRepository.findByEdicion(edicionRepository.findById(21L).get());
+		for (int i = 0; i < 4; i++) {
+			byEdicion.get(i).setSituacion(Situacion.Desmatriculado);
+		}
+		
+		alumnoEdicionRepository.saveAll(byEdicion);
+		List<AlumnoEdicion> byEdicion2 = alumnoEdicionRepository.findByEdicion(edicionRepository.findById(24L).get());
+		for (int i = 0; i < 8; i++) {
+			byEdicion2.get(i).setSituacion(Situacion.Desmatriculado);
+		}
+		
+		alumnoEdicionRepository.saveAll(byEdicion2);
+
 	}
 
 	private List<Tarea> crearTareas(List<Curso> cursos) {
@@ -307,112 +328,8 @@ public class Populaters {
 		return respuestas;
 	}
 
-	public List<Alumno> getAlumnos() {
-		return alumnos;
-	}
-
-	public void setAlumnos(List<Alumno> alumnos) {
-		this.alumnos = alumnos;
-	}
-
-	public List<Curso> getCursos() {
-		return cursos;
-	}
-
-	public void setCursos(List<Curso> cursos) {
-		this.cursos = cursos;
-	}
-
-	public List<Tutor> getTutores() {
-		return tutores;
-	}
-
-	public void setTutores(List<Tutor> tutores) {
-		this.tutores = tutores;
-	}
-
 	public List<Edicion> getEdiciones() {
-		return ediciones;
-	}
-
-	public void setEdiciones(List<Edicion> ediciones) {
-		this.ediciones = ediciones;
-	}
-
-	public List<AlumnoEdicion> getMatriculas() {
-		return matriculas;
-	}
-
-	public void setMatriculas(List<AlumnoEdicion> matriculas) {
-		this.matriculas = matriculas;
-	}
-
-	public List<Tarea> getTareas() {
-		return tareas;
-	}
-
-	public void setTareas(List<Tarea> tareas) {
-		this.tareas = tareas;
-	}
-
-	public List<ElementoEvaluado> getElementos() {
-		return elementos;
-	}
-
-	public void setElementos(List<ElementoEvaluado> elementos) {
-		this.elementos = elementos;
-	}
-
-	public List<Enunciado> getEnunciados() {
-		return enunciados;
-	}
-
-	public void setEnunciados(List<Enunciado> enunciados) {
-		this.enunciados = enunciados;
-	}
-
-	public List<Respuesta> getRespuestas() {
-		return respuestas;
-	}
-
-	public void setRespuestas(List<Respuesta> respuestas) {
-		this.respuestas = respuestas;
-	}
-
-	public AlumnoRepository getAlumnoRepository() {
-		return alumnoRepository;
-	}
-
-	public TutorRepository getTutorRepository() {
-		return tutorRepository;
-	}
-
-	public CursoRepository getCursoRepository() {
-		return cursoRepository;
-	}
-
-	public EdicionRepository getEdicionRepository() {
-		return edicionRepository;
-	}
-
-	public AlumnoEdicionRepository getAlumnoEdicionRepository() {
-		return alumnoEdicionRepository;
-	}
-
-	public TareaRepository getTareaRepository() {
-		return tareaRepository;
-	}
-
-	public ElementoEvaluadoRepository getElementoEvaluadoRepository() {
-		return elementoEvaluadoRepository;
-	}
-
-	public RespuestaRepository getRespuestaRepository() {
-		return respuestaRepository;
-	}
-
-	public EnunciadoRepository getEnunciadoRepository() {
-		return enunciadoRepository;
+		return edicionRepository.findAll();
 	}
 
 }

@@ -38,8 +38,8 @@ public class Edicion {
 	@OneToMany(mappedBy = "edicion", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
 	private List<AlumnoEdicion> inscripciones;
 
-	public void cancel() {
-		if(plazas<inscripciones.size()*2 && isBiggerThanPercentage(70)) {
+	public void cancelIfConditions() {
+		if(!(plazas<inscripciones.size()*2) || isBiggerThanPercentage(70)) {
 			aprobado=false;
 		}
 		

@@ -1,5 +1,6 @@
 package com.example.demo.controllers;
 
+import java.time.LocalDate;
 import java.util.List;
 
 import org.springframework.http.ResponseEntity;
@@ -20,8 +21,8 @@ public class CursoController {
 		this.edicionService = edicionService;
 	}
 
-//	@PatchMapping("cancelacion")
-//	public ResponseEntity<List<EdicionDTO>> cancelEditionFailed() {
-//		return ResponseEntity.ok(edicionService.cancelEditionOnFailure());
-//	}
+	@PatchMapping("cancelacion")
+	public ResponseEntity<List<EdicionDTO>> cancelEditionFailed(LocalDate fecha) {
+		return ResponseEntity.ok(edicionService.cancelEditionOnFailure(fecha));
+	}
 }

@@ -33,7 +33,7 @@ class CancelandoEdicionesFallidasTest {
 		Optional<Edicion> edicionById = edicionRepository.findById(2L);
 		Edicion edicion= edicionById.get();
 		long count = alumnoEdicionById.stream().filter(ae -> ae.getSituacion().equals(Situacion.Desmatriculado)).count();
-		edicion.cancel();
+		edicion.cancelIfConditions();
 		assertFalse(edicion.isAprobado());
 		
 		

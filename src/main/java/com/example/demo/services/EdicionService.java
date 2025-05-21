@@ -26,8 +26,15 @@ public class EdicionService {
 
 	public List<EdicionDTO> cancelEditionOnFailure(LocalDate fecha) {
 			List<Edicion> edicionesActivas = edicionRepository.findByFechaInicioLessThanEqualAndFechaFinalizacionGreaterThanEqual(fecha, fecha);
-			edicionesActivas.forEach(Edicion::cancel);
+			edicionesActivas.forEach(Edicion::cancelIfConditions);
 			edicionRepository.saveAll(edicionesActivas);
 			return edicionesActivas.stream().map(edicionMapper::mapToDTO).toList();	
 	}
+
+
+	public List<EdicionDTO> getEdicionesActivesAndCancelled(LocalDate fecha) {
+		List<Edicion> edicionesActivas = edicionRepository.findByFechaInicioLessThanEqualAndFechaFinalizacionGreaterThanEqual(fecha, fecha);
+		return edicionesActivas.stream().filter(e->!(e.isAprobado())).map(edicionMapper::mapToDTO).toList();
+	}
+	
 }
