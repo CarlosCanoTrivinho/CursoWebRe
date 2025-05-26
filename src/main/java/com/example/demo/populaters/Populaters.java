@@ -156,7 +156,9 @@ public class Populaters {
 				edicion.setFechaInicio(LocalDate.now().plusMonths(j));
 				edicion.setFechaFinalizacion(edicion.getFechaInicio().plusMonths(3));
 				edicion.setCurso(curso);
-				edicion.setTutor(tutores.get(random.nextInt(tutores.size())));
+				Tutor tutor = tutores.get(random.nextInt(tutores.size()));
+				edicion.setTutor(tutor);
+				tutor.addEdicion(edicion);
 				ediciones.add(edicion);
 			}
 		}

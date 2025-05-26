@@ -1,5 +1,6 @@
 package com.example.demo.Entities;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import com.example.demo.POJO.Categoria;
@@ -8,6 +9,7 @@ import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -26,8 +28,16 @@ public class Tutor {
 	@Enumerated(EnumType.STRING)
 	private Categoria categoria;
 	
-	@OneToMany(mappedBy = "tutor", cascade = CascadeType.ALL)
-    private List<Edicion> ediciones;
+	@OneToMany(mappedBy = "tutor", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    private List<Edicion> ediciones=new ArrayList<>();
+	
+	public void addEdicion(Edicion edicion) {
+		ediciones.add(edicion);
+	}
+	public void deleteEdicion(Edicion edicion) {
+		ediciones.remove(edicion);
+	}
+	
 	
 	
 	
